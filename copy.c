@@ -1,15 +1,8 @@
 #include "copy.h"
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-const int RW_FLAG = O_RDWR;
-const int RWC_FLAG = O_RDWR | O_CREAT;
-const mode_t RW_MODE = S_IRUSR | S_IWUSR;
-const int BUFFER_SIZE = 500;
 
 int openFile(const char* filePath, const int flag)
 {
@@ -51,6 +44,11 @@ struct stat getFileStats(const int fd)
 	printf("Blocks allocated: %jd\n", (intmax_t) fileStats.st_blocks);
 
 	return fileStats;
+}
+
+void getCopyRange(int fd, ssize_t startBytes, ssize_t endBytes)
+{
+
 }
 
 void copy(const char* file1Path, const char* file2Path)
