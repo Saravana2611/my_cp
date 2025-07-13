@@ -99,6 +99,26 @@ void copyFile(int fd1, int fd2, int offset, ssize_t size)
 	}
 }
 
+void createChild(int fd1, int fd2, struct Ranges ranges, int i)
+{
+	pid_t pid = fork();
+
+	if (pid < 0)
+	{
+		printf("Error in Creating Child Process\n");
+		exit(1);
+	}
+	else if (pid == 0)
+	{
+		printf("Child process copying....\n");
+		printf("startBytes of %d = %zd \n", i, ranges.startBytes[i]);
+		printf("EndButes of %d = %zd \n", i, ranges.endBytes[i]);
+		copyFile(fd1, fd2, ranges.startBytes[i], ranges.endBytes[i] - ranges.startBytes[i]);
+		exit(0);
+	}
+	
+}
+
 void copy(const char *file1Path, const char *file2Path)
 {
 	printf("Called Copy\n");
@@ -114,9 +134,14 @@ void copy(const char *file1Path, const char *file2Path)
 
 	for (int i = 0; i < 2; i++)
 	{
-		printf("startBytes of %d = %zd \n", i, ranges.startBytes[i]);
-		printf("EndButes of %d = %zd \n", i, ranges.endBytes[i]);
-		copyFile(fd1, fd2, ranges.startBytes[i], ranges.endBytes[i] - ranges.startBytes[i]);
+		createChild(fd1, fd2, ranges, i);
+	}
+
+	pid_t pid;
+	int status;
+	while((pid = wait(&status)) > 0)
+	{
+		printf("Completed %d\n", pid);
 	}
 
 	closeFile(fd1);

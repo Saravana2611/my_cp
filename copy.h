@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 static const int RW_FLAG = O_RDWR;
 static const int RWC_FLAG = O_RDWR | O_CREAT;
