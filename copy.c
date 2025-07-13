@@ -4,37 +4,38 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-int RW_FLAG = O_RDWR;
-int RWC_FLAG = O_RDWR | O_CREAT;
-mode_t RW_MODE = S_IRUSR | S_IWUSR;
-int BUFFER_SIZE = 500;
+const int RW_FLAG = O_RDWR;
+const int RWC_FLAG = O_RDWR | O_CREAT;
+const mode_t RW_MODE = S_IRUSR | S_IWUSR;
+const int BUFFER_SIZE = 500;
 
-int openFile(char* filePath, int flag)
+int openFile(const char* filePath, const int flag)
 {
 	printf("Called OpenFile\n");
         int fd = open(filePath, flag, RW_MODE);
         if (fd < 0)
         {
                 printf("Error in opening file\n");
-                return -1; //Change to EXIT()
+		exit(1);
         }
         printf("File opened\n");
 	return fd;
 }
 
-void closeFile(int fd)
+void closeFile(const int fd)
 {
 	printf("Called CloseFile\n");
 	int ret = close(fd);
 	if (ret < 0)
 	{
 		printf("Error in closing file\n");
-		// return -1;  Change to Exit()
+		exit(1);
 	}
 }
 
-struct stat getFileStats(int fd)
+struct stat getFileStats(const int fd)
 {
 	printf("Called getFileStats\n");
 
@@ -43,6 +44,7 @@ struct stat getFileStats(int fd)
 	if (ret != 0)
 	{
 		printf("Error in fetching file stats\n");
+		exit(1);
 	}
 
 	printf("File size: %jd bytes\n", (intmax_t) fileStats.st_size);
@@ -51,7 +53,7 @@ struct stat getFileStats(int fd)
 	return fileStats;
 }
 
-void copy(char* file1Path, char* file2Path)
+void copy(const char* file1Path, const char* file2Path)
 {
 	printf("Called Copy\n");
 	char buffer[BUFFER_SIZE];
@@ -67,6 +69,8 @@ void copy(char* file1Path, char* file2Path)
 	{
 		write(fd2, buffer, bytesRead);
 	}
+
+        fil2Stats = getFileStats(fd2);
 
 	closeFile(fd1);
 	closeFile(fd2);
