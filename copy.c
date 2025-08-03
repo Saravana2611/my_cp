@@ -69,6 +69,13 @@ void copyFile(int fd1, int fd2, int offset, ssize_t size)
 		exit(1);
 	}
 
+	// reposition to file writer
+	if (lseek(fd2, offset, SEEK_SET) == -1)
+	{
+		printf("Error in seeking file\n");
+		exit(1);
+	}
+
 	while (totalBytesCopied < size)
 	{
 		ssize_t toRead = BUFFER_SIZE;
@@ -88,11 +95,16 @@ void copyFile(int fd1, int fd2, int offset, ssize_t size)
 			exit(1);
 		}
 
-		ssize_t bytesWritten = write(fd2, buffer, bytesRead);
-		if (bytesWritten < 0)
+		ssize_t bytesWritten = 0;
+		while (bytesWritten < bytesRead)
 		{
-			printf("Error in Wrtiting File\n");
-			exit(1);
+			ssize_t bw = write(fd2, buffer + bytesWritten, bytesRead - bytesWritten);
+			if (bw < 0)
+			{
+				printf("Error in writting");
+				exit(1);
+			}
+			bytesWritten += bw;
 		}
 		printf("BytesWritten = %zd\n", bytesWritten);
 		totalBytesCopied += bytesRead;
